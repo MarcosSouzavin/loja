@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PromoCasa</title>
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body>
+
+  <header>
+    <span class="logo">⚡ PromoCasa</span>
+    <nav>
+      <span id="usuario-logado"></span>
+      <button class="btn btn-ghost" id="btn-carrinho">
+        🛒 Carrinho <span id="qtd-carrinho">0</span>
+      </button>
+      <a href="login.html" id="link-login" class="btn btn-primario">Entrar</a>
+      <a href="admin.html" id="link-admin" class="btn btn-ghost" style="display:none">Admin</a>
+      <button class="btn btn-perigo" id="btn-logout" style="display:none">Sair</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Produtos em destaque</h2>
+    <div id="lista-produtos"></div>
+  </main>
+
+  <div id="modal-carrinho" style="display:none">
+    <div class="modal-conteudo">
+      <h2>🛒 Seu Carrinho</h2>
+      <div id="itens-carrinho"></div>
+      <div class="carrinho-total">
+        <span>Total</span>
+        <span>R$ <span id="total-carrinho">0,00</span></span>
+      </div>
+      <div class="modal-acoes">
+        <button class="btn btn-primario" id="btn-finalizar" style="flex:1">Finalizar Pedido</button>
+        <button class="btn btn-ghost" id="btn-fechar">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="./assets/js/utils.js"></script>
+  <script src="./assets/js/app.js"></script>
+</body>
+</html>

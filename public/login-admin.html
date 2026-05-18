@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login — TechStore</title>
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body>
+
+  <header>
+    <a href="/" class="logo">⚡ TechStore</a>
+    <nav></nav>
+  </header>
+
+  <div class="form-container">
+    <h2>Área Restrita</h2>
+    <p class="subtitulo">Acesso exclusivo para administradores</p>
+    <div class="campo">
+      <label>E-mail</label>
+      <input type="email" id="email" placeholder="admin@email.com">
+    </div>
+    <div class="campo">
+      <label>Senha</label>
+      <input type="password" id="senha" placeholder="••••••••">
+    </div>
+    <button class="btn btn-primario" id="btn-entrar" style="width:100%;padding:.8rem;margin-top:.5rem">
+      Entrar como Admin
+    </button>
+    <p style="text-align:center;margin-top:1rem">
+      <a href="/" style="color:var(--muted);font-size:.85rem">← Voltar à loja</a>
+    </p>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="utils.js"></script>
+  <script>
+    document.getElementById('btn-entrar').addEventListener('click', async () => {
+      const email = document.getElementById('email').value
+      const senha = document.getElementById('senha').value
+      if (!email || !senha) { toast('Preencha todos os campos', 'erro'); return }
+
+      const res  = await fetch('/api/usuarios/login-admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha })
+      })
+      const data = await res.json()
+
+      if (res.ok) {
+        toast('Bem-vindo, admin!', 'sucesso')
+        setTimeout(() => window.location.href = '/admin.html', 800)
+      } else {
+        toast(data.erro, 'erro')
+      }
+    })
+  </script>
+</body>
+</html>

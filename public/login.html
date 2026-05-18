@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Login — PromoCasa</title>
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body>
+
+  <header>
+    <a href="/" class="logo">⚡ PromoCasa</a>
+    <nav></nav>
+  </header>
+
+  <div id="tela-login" class="form-container">
+    <h2>Bem-vindo de volta</h2>
+    <p class="subtitulo">Entre na sua conta para continuar</p>
+    <div class="campo">
+      <label>E-mail</label>
+      <input type="email" id="login-email" placeholder="seu@email.com">
+    </div>
+    <div class="campo">
+      <label>Senha</label>
+      <input type="password" id="login-senha" placeholder="••••••••">
+    </div>
+    <button class="btn btn-primario" id="btn-login" style="width:100%;padding:.8rem;margin-top:.5rem">
+      Entrar
+    </button>
+    <p style="text-align:center;margin-top:1rem;color:var(--muted);font-size:.9rem">
+      Não tem conta?
+      <a href="#" id="ir-cadastro" style="color:var(--roxo2)">Criar conta</a>
+    </p>
+  </div>
+
+  <div id="tela-cadastro" class="form-container" style="display:none">
+    <h2>Criar conta</h2>
+    <p class="subtitulo">Comece a comprar agora</p>
+    <div class="campo">
+      <label>Nome</label>
+      <input type="text" id="cad-nome" placeholder="Seu nome">
+    </div>
+    <div class="campo">
+      <label>E-mail</label>
+      <input type="email" id="cad-email" placeholder="seu@email.com">
+    </div>
+    <div class="campo">
+      <label>Senha</label>
+      <input type="password" id="cad-senha" placeholder="Mínimo 6 caracteres">
+    </div>
+    <button class="btn btn-primario" id="btn-cadastrar" style="width:100%;padding:.8rem;margin-top:.5rem">
+      Criar conta
+    </button>
+    <p style="text-align:center;margin-top:1rem;color:var(--muted);font-size:.9rem">
+      Já tem conta?
+      <a href="#" id="ir-login" style="color:var(--roxo2)">Entrar</a>
+    </p>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="./assets/js/utils.js"></script>
+  <script src="./assets/js/auth.js"></script>
+</body>
+</html>

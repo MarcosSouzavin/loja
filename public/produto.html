@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Produto — TechStore</title>
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body>
+
+  <header>
+    <a href="/" class="logo">PromoCasa</a>
+    <nav>
+      <span id="usuario-logado"></span>
+      <button class="btn btn-ghost" id="btn-carrinho">
+        🛒 Carrinho <span id="qtd-carrinho">0</span>
+      </button>
+      <a href="login.html" id="link-login" class="btn btn-primario">Entrar</a>
+      <button class="btn btn-perigo" id="btn-logout" style="display:none">Sair</button>
+    </nav>
+  </header>
+
+  <main>
+    <a href="/" style="color:var(--muted);text-decoration:none;font-size:.9rem">← Voltar</a>
+
+    <div id="detalhe-produto" style="margin-top:2rem"></div>
+
+    <div style="margin-top:3rem">
+      <h3 style="margin-bottom:1rem">Avaliações</h3>
+      <div id="lista-avaliacoes"></div>
+
+      <div id="form-avaliacao" style="display:none;margin-top:1.5rem">
+        <h4 style="margin-bottom:1rem">Deixe sua avaliação</h4>
+        <div class="campo">
+          <label>Nota</label>
+          <div id="estrelas" style="display:flex;gap:.3rem;font-size:1.8rem;cursor:pointer">
+            <span data-nota="1">☆</span>
+            <span data-nota="2">☆</span>
+            <span data-nota="3">☆</span>
+            <span data-nota="4">☆</span>
+            <span data-nota="5">☆</span>
+          </div>
+          <input type="hidden" id="av-nota" value="0">
+        </div>
+        <div class="campo">
+          <label>Comentário</label>
+          <textarea id="av-comentario" rows="3" placeholder="O que você achou do produto?"
+            style="width:100%;padding:.75rem;background:var(--bg);border:1px solid var(--borda);border-radius:8px;color:var(--texto);font-size:.95rem;resize:vertical"></textarea>
+        </div>
+        <button class="btn btn-primario" id="btn-avaliar">Enviar avaliação</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal carrinho (igual ao index) -->
+  <div id="modal-carrinho" style="display:none">
+    <div class="modal-conteudo">
+      <h2>🛒 Seu Carrinho</h2>
+      <div id="itens-carrinho"></div>
+      <div class="carrinho-total">
+        <span>Total</span>
+        <span>R$ <span id="total-carrinho">0,00</span></span>
+      </div>
+      <div class="modal-acoes">
+        <button class="btn btn-primario" id="btn-finalizar" style="flex:1">Finalizar Pedido</button>
+        <button class="btn btn-ghost" id="btn-fechar">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="./assets/js/utils.js"></script>
+  <script src="./assets/js/app.js"></script>
+  <script src="./assets/js/produto.js"></script>
+</body>
+</html>
