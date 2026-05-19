@@ -3,29 +3,121 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PromoCasa</title>
+  <title>TechStore</title>
   <link rel="stylesheet" href="./assets/css/style.css">
 </head>
 <body>
 
-  <header>
-    <span class="logo">⚡ PromoCasa</span>
-    <nav>
-      <span id="usuario-logado"></span>
-      <button class="btn btn-ghost" id="btn-carrinho">
-        🛒 Carrinho <span id="qtd-carrinho">0</span>
+  <!-- TOPO -->
+  <div class="topo-bar">
+    🚚 Frete grátis acima de R$ 299 &nbsp;|&nbsp; 🔒 Compra 100% segura
+  </div>
+
+  <!-- HEADER -->
+  <header class="header-main">
+    <a href="/" class="logo">⚡ TechStore</a>
+
+    <div class="header-busca">
+      <input type="text" id="busca" placeholder="O que você procura hoje?">
+      <button id="btn-buscar">🔍</button>
+    </div>
+
+    <div class="header-acoes">
+      <div id="area-usuario">
+        <a href="./login.html" id="link-login" class="header-btn">
+          👤 Entrar
+        </a>
+        <div id="area-logado" style="display:none">
+          <span id="usuario-logado"></span>
+          <button class="header-btn-txt" id="btn-logout">Sair</button>
+        </div>
+      </div>
+      <a href="./login-admin.html" id="link-admin" style="display:none" class="header-btn">⚙️</a>
+      <button class="header-carrinho" id="btn-carrinho">
+        🛒
+        <span id="qtd-carrinho" class="carrinho-badge">0</span>
       </button>
-      <a href="login.html" id="link-login" class="btn btn-primario">Entrar</a>
-      <a href="admin.html" id="link-admin" class="btn btn-ghost" style="display:none">Admin</a>
-      <button class="btn btn-perigo" id="btn-logout" style="display:none">Sair</button>
-    </nav>
+    </div>
   </header>
 
-  <main>
-    <h2>Produtos em destaque</h2>
+  <!-- NAV CATEGORIAS -->
+  <nav class="nav-categorias">
+    <a href="#" onclick="filtrarCategoria('')">Todos</a>
+    <a href="#" onclick="filtrarCategoria('notebook')">Notebooks</a>
+    <a href="#" onclick="filtrarCategoria('smartphone')">Smartphones</a>
+    <a href="#" onclick="filtrarCategoria('monitor')">Monitores</a>
+    <a href="#" onclick="filtrarCategoria('periferico')">Periféricos</a>
+    <a href="#" onclick="filtrarCategoria('audio')">Áudio</a>
+    <a href="#" onclick="filtrarCategoria('games')">Games</a>
+  </nav>
+
+  <!-- BANNER -->
+  <div class="banner-container">
+    <div class="banner" id="banner-ativo">
+      <div class="banner-texto">
+        <p class="banner-tag">⚡ Oferta relâmpago</p>
+        <h2>Os melhores produtos<br>tech com o menor preço</h2>
+        <a href="#produtos" class="btn btn-primario" style="margin-top:1rem;display:inline-flex">
+          Ver ofertas
+        </a>
+      </div>
+      <div class="banner-img">💻</div>
+    </div>
+    <div class="banner-dots">
+      <span class="dot ativo"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  </div>
+
+  <!-- FAIXAS DE PREÇO -->
+  <div class="faixas-preco">
+    <button onclick="filtrarPreco(0, 100)">Até R$ 100</button>
+    <button onclick="filtrarPreco(100, 500)">R$ 100 – R$ 500</button>
+    <button onclick="filtrarPreco(500, 2000)">R$ 500 – R$ 2.000</button>
+    <button onclick="filtrarPreco(2000, 999999)">Acima de R$ 2.000</button>
+  </div>
+
+  <!-- PRODUTOS -->
+  <main id="produtos">
+    <div class="produtos-header">
+      <h2>Produtos em destaque</h2>
+      <div style="display:flex;gap:.8rem;align-items:center">
+        <p id="resultado-busca" style="color:var(--muted);font-size:.9rem"></p>
+        <select id="filtro-ordem"
+          style="padding:.6rem 1rem;background:var(--card);border:1px solid var(--borda);border-radius:8px;color:var(--texto);font-size:.9rem">
+          <option value="">Ordenar por</option>
+          <option value="menor">Menor preço</option>
+          <option value="maior">Maior preço</option>
+          <option value="nome">Nome A-Z</option>
+        </select>
+        <button class="btn btn-ghost" id="btn-limpar" style="display:none">✕ Limpar</button>
+      </div>
+    </div>
     <div id="lista-produtos"></div>
   </main>
 
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <h4>⚡ TechStore</h4>
+        <p>A melhor loja de eletrônicos do Brasil.</p>
+      </div>
+      <div>
+        <h4>Links</h4>
+        <a href="/">Início</a>
+        <a href="login.html">Minha conta</a>
+      </div>
+      <div>
+        <h4>Segurança</h4>
+        <p>🔒 Pagamento seguro</p>
+        <p>🚚 Entrega garantida</p>
+      </div>
+    </div>
+    <p class="footer-copy">© 2026 TechStore. Todos os direitos reservados.</p>
+  </footer>
+
+  <!-- Modal carrinho -->
   <div id="modal-carrinho" style="display:none">
     <div class="modal-conteudo">
       <h2>🛒 Seu Carrinho</h2>

@@ -128,6 +128,120 @@ async function finalizarPedido() {
     toast(data.erro || 'Faça login para finalizar o pedido', 'erro')
   }
 }
+let todosProdutos = []
+
+async function carregarProdutos() {
+  const res     = await fetch('/api/produtos')
+  todosProdutos = await res.json()
+  renderizarProdutos(todosProdutos)
+
+  // Eventos de busca e filtro
+  document.getElementById('busca').addEventListener('input', filtrar)
+  document.getElementById('filtro-ordem').addEventListener('change', filtrar)
+  document.getElementById('btn-limpar').addEventListener('click', () => {
+    document.getElementById('busca').value = ''
+    document.getElementById('filtro-ordem').value = ''
+    document.getElementById('btn-limpar').style.display = 'none'
+    renderizarProdutos(todosProdutos)
+  })
+}
+
+function filtrar() {
+  const busca  = document.getElementById('busca').value.toLowerCase().trim()
+  const ordem  = document.getElementById('filtro-ordem').value
+  const btnLimpar = document.getElementById('btn-limpar')
+
+  btnLimpar.style.display = busca || ordem ? 'inline-flex' : 'none'
+
+  let resultado = [...todosProdutos]
+
+  // Filtra por texto
+  if (busca) {
+    resultado = resultado.filter(p =>
+      p.nome.toLowerCase().includes(busca) ||
+      (p.descricao || '').toLowerCase().includes(busca)
+    )
+  }
+
+  // Ordena
+  if (ordem === 'menor') resultado.sort((a, b) => a.preco - b.preco)
+  if (ordem === 'maior') resultado.sort((a, b) => b.preco - a.preco)
+  if (ordem === 'nome')  resultado.sort((a, b) => a.nome.localeCompare(b.nome))
+
+  renderizarProdutos(resultado, busca)
+}
+
+function renderizarProdutos(produtos, busca = '') {
+  const lista     = document.getElementById('lista-produtos')
+  const resultado = document.getElementById('resultado-busca')
+
+  if (busca) {
+    resultado.textContent = `${produtos.length} resultado${produtos.length !== 1 ? 's' : ''} para "${busca}"`
+  } else {
+    resultado.textContent = ''
+  }
+
+  if (produtos.length === 0) {
+    lista.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--muted)">
+        <p style="font-size:2rem;margin-bottom:.5rem">🔍</p>
+        <p>Nenhum produto encontrado.</p>
+      </div>
+    `
+    return
+  }
+
+  lista.innerHTML = produtos.map(p => `
+    <div class="card-produto">
+      <a href="produto.html?id=${p.id}" style="text-decoration:none;color:inherit">
+        ${p.imagem
+          ? `<img src="${p.imagem}" alt="${p.nome}" onerror="this.style.display='none'">`
+          : `<div class="sem-imagem">📦</div>`
+        }
+        <h3 style="margin-bottom:.4rem">${destacar(p.nome, busca)}</h3>
+      </a>
+      <p class="descricao">${p.descricao || '—'}</p>
+      <p class="preco">R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</p>
+      <p class="estoque">${p.estoque > 0 ? `${p.estoque} em estoque` : '⚠️ Sem estoque'}</p>
+      <button
+        class="btn btn-primario"
+        style="width:100%"
+        ${p.estoque === 0 ? 'disabled' : ''}
+        onclick="adicionarAoCarrinho(${p.id}, '${p.nome.replace(/'/g,"\\'")}', ${p.preco}, ${p.estoque})"
+      >
+        ${p.estoque === 0 ? 'Sem estoque' : 'Adicionar ao carrinho'}
+      </button>
+    </div>
+  `).join('')
+}
+
+function filtrarCategoria(termo) {
+  document.querySelectorAll('.nav-categorias a').forEach(a => a.classList.remove('ativo'))
+  event.target.classList.add('ativo')
+
+  if (!termo) {
+    renderizarProdutos(todosProdutos)
+    return
+  }
+  const resultado = todosProdutos.filter(p =>
+    (p.nome + ' ' + (p.descricao || '')).toLowerCase().includes(termo)
+  )
+  renderizarProdutos(resultado)
+}
+
+function filtrarPreco(min, max) {
+  const resultado = todosProdutos.filter(p => p.preco >= min && p.preco <= max)
+  renderizarProdutos(resultado)
+  document.getElementById('resultado-busca').textContent =
+    `Filtrando por preço: R$ ${min} – ${max === 999999 ? '∞' : 'R$ ' + max}`
+  document.getElementById('btn-limpar').style.display = 'inline-flex'
+}
+
+function destacar(texto, busca) {
+  if (!busca) return texto
+  const regex = new RegExp(`(${busca})`, 'gi')
+  return texto.replace(regex, `<mark style="background:var(--roxo);color:white;border-radius:3px;padding:0 2px">$1</mark>`)
+}
 
 async function verificarLogin() {
   const res = await fetch('/api/usuarios/perfil').catch(() => null)
