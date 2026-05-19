@@ -1,4 +1,5 @@
 let carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]')
+let todosProdutos = []
 
 document.addEventListener('DOMContentLoaded', () => {
   carregarProdutos()
@@ -12,36 +13,85 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function carregarProdutos() {
   const res = await fetch('/api/produtos')
-  const produtos = await res.json()
+  todosProdutos = await res.json()
+  renderizarProdutos(todosProdutos)
+
+  // Eventos de busca e filtro
+  document.getElementById('busca').addEventListener('input', filtrar)
+  document.getElementById('filtro-ordem').addEventListener('change', filtrar)
+  document.getElementById('btn-limpar').addEventListener('click', () => {
+    document.getElementById('busca').value = ''
+    document.getElementById('filtro-ordem').value = ''
+    document.getElementById('btn-limpar').style.display = 'none'
+    renderizarProdutos(todosProdutos)
+  })
+}
+
+function filtrar() {
+  const busca = document.getElementById('busca').value.toLowerCase().trim()
+  const ordem = document.getElementById('filtro-ordem').value
+  const btnLimpar = document.getElementById('btn-limpar')
+
+  btnLimpar.style.display = busca || ordem ? 'inline-flex' : 'none'
+
+  let resultado = [...todosProdutos]
+
+  if (busca) {
+    resultado = resultado.filter(p =>
+      p.nome.toLowerCase().includes(busca) ||
+      (p.descricao || '').toLowerCase().includes(busca)
+    )
+  }
+
+  if (ordem === 'menor') resultado.sort((a, b) => a.preco - b.preco)
+  if (ordem === 'maior') resultado.sort((a, b) => b.preco - a.preco)
+  if (ordem === 'nome')  resultado.sort((a, b) => a.nome.localeCompare(b.nome))
+
+  renderizarProdutos(resultado, busca)
+}
+
+function renderizarProdutos(produtos, busca = '') {
   const lista = document.getElementById('lista-produtos')
+  const resultado = document.getElementById('resultado-busca')
+
+  if (busca) {
+    resultado.textContent = `${produtos.length} resultado${produtos.length !== 1 ? 's' : ''} para "${busca}"`
+  } else {
+    resultado.textContent = ''
+  }
 
   if (produtos.length === 0) {
-    lista.innerHTML = '<p style="color:var(--muted)">Nenhum produto cadastrado ainda.</p>'
+    lista.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--muted)">
+        <p style="font-size:2rem;margin-bottom:.5rem">🔍</p>
+        <p>Nenhum produto encontrado.</p>
+      </div>
+    `
     return
   }
 
-lista.innerHTML = produtos.map(p => `
-  <div class="card-produto">
-    <a href="produto.html?id=${p.id}" style="text-decoration:none;color:inherit">
-      ${p.imagem
-        ? `<img src="${p.imagem}" alt="${p.nome}" onerror="this.style.display='none'">`
-        : `<div class="sem-imagem">📦</div>`
-      }
-      <h3 style="margin-bottom:.4rem">${p.nome}</h3>
-    </a>
-    <p class="descricao">${p.descricao || '—'}</p>
-    <p class="preco">R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</p>
-    <p class="estoque">${p.estoque > 0 ? `${p.estoque} em estoque` : '⚠️ Sem estoque'}</p>
-    <button
-      class="btn btn-primario"
-      style="width:100%"
-      ${p.estoque === 0 ? 'disabled' : ''}
-      onclick="adicionarAoCarrinho(${p.id}, '${p.nome.replace(/'/g,"\\'")}', ${p.preco}, ${p.estoque})"
-    >
-      ${p.estoque === 0 ? 'Sem estoque' : 'Adicionar ao carrinho'}
-    </button>
-  </div>
-`).join('')
+  lista.innerHTML = produtos.map(p => `
+    <div class="card-produto">
+      <a href="produto.html?id=${p.id}" style="text-decoration:none;color:inherit">
+        ${p.imagem
+          ? `<img src="${p.imagem}" alt="${p.nome}" onerror="this.style.display='none'">`
+          : `<div class="sem-imagem">📦</div>`
+        }
+        <h3 style="margin-bottom:.4rem">${destacar(p.nome, busca)}</h3>
+      </a>
+      <p class="descricao">${p.descricao || '—'}</p>
+      <p class="preco">R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</p>
+      <p class="estoque">${p.estoque > 0 ? `${p.estoque} em estoque` : '⚠️ Sem estoque'}</p>
+      <button
+        class="btn btn-primario"
+        style="width:100%"
+        ${p.estoque === 0 ? 'disabled' : ''}
+        onclick="adicionarAoCarrinho(${p.id}, '${p.nome.replace(/'/g,"\\'")}', ${p.preco}, ${p.estoque})"
+      >
+        ${p.estoque === 0 ? 'Sem estoque' : 'Adicionar ao carrinho'}
+      </button>
+    </div>
+  `).join('')
 }
 
 function adicionarAoCarrinho(id, nome, preco, estoque) {
@@ -128,92 +178,6 @@ async function finalizarPedido() {
     toast(data.erro || 'Faça login para finalizar o pedido', 'erro')
   }
 }
-let todosProdutos = []
-
-async function carregarProdutos() {
-  const res     = await fetch('/api/produtos')
-  todosProdutos = await res.json()
-  renderizarProdutos(todosProdutos)
-
-  // Eventos de busca e filtro
-  document.getElementById('busca').addEventListener('input', filtrar)
-  document.getElementById('filtro-ordem').addEventListener('change', filtrar)
-  document.getElementById('btn-limpar').addEventListener('click', () => {
-    document.getElementById('busca').value = ''
-    document.getElementById('filtro-ordem').value = ''
-    document.getElementById('btn-limpar').style.display = 'none'
-    renderizarProdutos(todosProdutos)
-  })
-}
-
-function filtrar() {
-  const busca  = document.getElementById('busca').value.toLowerCase().trim()
-  const ordem  = document.getElementById('filtro-ordem').value
-  const btnLimpar = document.getElementById('btn-limpar')
-
-  btnLimpar.style.display = busca || ordem ? 'inline-flex' : 'none'
-
-  let resultado = [...todosProdutos]
-
-  // Filtra por texto
-  if (busca) {
-    resultado = resultado.filter(p =>
-      p.nome.toLowerCase().includes(busca) ||
-      (p.descricao || '').toLowerCase().includes(busca)
-    )
-  }
-
-  // Ordena
-  if (ordem === 'menor') resultado.sort((a, b) => a.preco - b.preco)
-  if (ordem === 'maior') resultado.sort((a, b) => b.preco - a.preco)
-  if (ordem === 'nome')  resultado.sort((a, b) => a.nome.localeCompare(b.nome))
-
-  renderizarProdutos(resultado, busca)
-}
-
-function renderizarProdutos(produtos, busca = '') {
-  const lista     = document.getElementById('lista-produtos')
-  const resultado = document.getElementById('resultado-busca')
-
-  if (busca) {
-    resultado.textContent = `${produtos.length} resultado${produtos.length !== 1 ? 's' : ''} para "${busca}"`
-  } else {
-    resultado.textContent = ''
-  }
-
-  if (produtos.length === 0) {
-    lista.innerHTML = `
-      <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--muted)">
-        <p style="font-size:2rem;margin-bottom:.5rem">🔍</p>
-        <p>Nenhum produto encontrado.</p>
-      </div>
-    `
-    return
-  }
-
-  lista.innerHTML = produtos.map(p => `
-    <div class="card-produto">
-      <a href="produto.html?id=${p.id}" style="text-decoration:none;color:inherit">
-        ${p.imagem
-          ? `<img src="${p.imagem}" alt="${p.nome}" onerror="this.style.display='none'">`
-          : `<div class="sem-imagem">📦</div>`
-        }
-        <h3 style="margin-bottom:.4rem">${destacar(p.nome, busca)}</h3>
-      </a>
-      <p class="descricao">${p.descricao || '—'}</p>
-      <p class="preco">R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</p>
-      <p class="estoque">${p.estoque > 0 ? `${p.estoque} em estoque` : '⚠️ Sem estoque'}</p>
-      <button
-        class="btn btn-primario"
-        style="width:100%"
-        ${p.estoque === 0 ? 'disabled' : ''}
-        onclick="adicionarAoCarrinho(${p.id}, '${p.nome.replace(/'/g,"\\'")}', ${p.preco}, ${p.estoque})"
-      >
-        ${p.estoque === 0 ? 'Sem estoque' : 'Adicionar ao carrinho'}
-      </button>
-    </div>
-  `).join('')
-}
 
 function filtrarCategoria(termo) {
   document.querySelectorAll('.nav-categorias a').forEach(a => a.classList.remove('ativo'))
@@ -245,17 +209,45 @@ function destacar(texto, busca) {
 
 async function verificarLogin() {
   const res = await fetch('/api/usuarios/perfil').catch(() => null)
+  
+  const linkLogin = document.getElementById('link-login')
+  const areaLogado = document.getElementById('area-logado')
+  const btnLogout = document.getElementById('btn-logout')
+  const linkAdmin = document.getElementById('link-admin')
+
+  // CASO 1: USUÁRIO LOGADO COM SUCESSO
   if (res && res.ok) {
     const data = await res.json()
-    document.getElementById('usuario-logado').textContent = `Olá, ${data.nome}`
-    document.getElementById('link-login').style.display = 'none'
+    
+    // 1. Esconde o botão de entrar de vez
+    if (linkLogin) linkLogin.style.display = 'none'
 
-    const btnLogout = document.getElementById('btn-logout')
-    btnLogout.style.display = 'inline-flex'
-    btnLogout.onclick = logout  // registra direto aqui, depois que o botão aparece
+    // 2. Mostra a área do usuário e injeta o nome correto
+    if (areaLogado) areaLogado.style.display = 'inline-flex'
+    const txtUsuario = document.getElementById('usuario-logado')
+    if (txtUsuario) txtUsuario.textContent = `Olá, ${data.nome} `
+    
+    // 3. Mostra o botão de Sair e vincula o clique
+    if (btnLogout) {
+      btnLogout.style.display = 'inline-flex'
+      btnLogout.onclick = logout  
+    }
 
-    const linkAdmin = document.getElementById('link-admin')
-    if (data.admin) linkAdmin.style.display = 'inline-flex'
+    // 4. Mostra a engrenagem APENAS se o retorno do banco for admin (true)
+    if (linkAdmin) {
+      linkAdmin.style.display = data.admin ? 'inline-flex' : 'none'
+    }
+
+  } 
+  // CASO 2: DESLOGADO (Ou o token expirou / deu erro na rota)
+  else {
+    // 1. Garante que o botão de Entrar reapareça
+    if (linkLogin) linkLogin.style.display = 'inline-flex'
+
+    // 2. Esconde todo o resto (Nome, Sair, Engrenagem)
+    if (areaLogado) areaLogado.style.display = 'none'
+    if (btnLogout) btnLogout.style.display = 'none'
+    if (linkAdmin) linkAdmin.style.display = 'none'
   }
 }
 

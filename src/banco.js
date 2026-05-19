@@ -53,7 +53,15 @@ db.exec(`
     FOREIGN KEY (pedido_id) REFERENCES pedidos(id),
     FOREIGN KEY (produto_id) REFERENCES produtos(id)
   );
+    CREATE TABLE IF NOT EXISTS tentativas_admin (
+    ip TEXT NOT NULL,
+    tentativas INTEGER DEFAULT 1,
+    bloqueado_ate DATETIME,
+    ultima_tentativa DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 `);
+
+db.pragma('foreign_keys = ON');                 
 
 module.exports = db
 

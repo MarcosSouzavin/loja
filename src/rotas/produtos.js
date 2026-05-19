@@ -45,10 +45,13 @@ router.delete('/:id', verificarAdmin, (req, res) => {
   const produto = db.prepare('SELECT id FROM produtos WHERE id = ?').get(id)
   if (!produto) return res.status(404).json({ erro: 'Produto não encontrado' })
 
+  const deletar = db.transaction(() => {
+    db.prepare('DELETE FROM avaliacoes WHERE produto_id = ?').run(id)    // ← faltava isso
+    db.prepare('DELETE FROM itens_pedido WHERE produto_id = ?').run(id)
+    db.prepare('DELETE FROM produtos WHERE id = ?').run(id)
+  })
 
-  db.prepare('DELETE FROM itens_pedido WHERE produto_id = ?').run(id)
-  db.prepare('DELETE FROM produtos WHERE id = ?').run(id)
-
+  deletar()
   res.json({ mensagem: 'Produto excluído!' })
 })
 

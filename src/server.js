@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 
 const tentativas = new Map()
 
-app.use('/api/usuarios/login', (req, res, next) => {
+function rateLimiter(req, res, next) {
   const ip = req.ip
   const agora = Date.now()
   const registro = tentativas.get(ip) || { count: 0, desde: agora }
@@ -43,7 +43,10 @@ app.use('/api/usuarios/login', (req, res, next) => {
   }
 
   next()
-})
+}
+
+app.use('/api/usuarios/login', rateLimiter)
+app.use('/api/usuarios/login-admin', rateLimiter)
 
 
 app.use('/api/produtos',  require('./rotas/produtos'))
@@ -67,3 +70,4 @@ app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`)
   console.log(`Ambiente: ${process.env.NODE_ENV}`)
 })
+
