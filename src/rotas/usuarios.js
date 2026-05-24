@@ -92,87 +92,36 @@ router.get('/perfil', verificarToken, (req, res) => {
     return res.status(500).json({ erro: 'Erro interno no servidor.' })
   }
 })
-router.post('/tornar-admin', verificarToken, (req, res) => {
-  const { senha_master } = req.body
-  const ip = req.ip
-
-  if (!senha_master)
-    return res.status(400).json({ erro: 'Senha master obrigatória' })
-
- 
-  let registro = db.prepare(
-    'SELECT * FROM tentativas_admin WHERE ip = ?'
-  ).get(ip)
-
-  const agora = new Date()
-
-  // Verifica se está bloqueado
-  if (registro?.bloqueado_ate) {
-    const bloqueadoAte = new Date(registro.bloqueado_ate)
-    if (agora < bloqueadoAte) {
-      const minutosRestantes = Math.ceil((bloqueadoAte - agora) / 60000)
-      return res.status(429).json({
-        erro: `IP bloqueado. Tente novamente em ${minutosRestantes} minuto(s).`
-      })
-    } else {
-
-      db.prepare('DELETE FROM tentativas_admin WHERE ip = ?').run(ip)
-      registro = null
-    }
+router.get('/listar-todos/:senha', (req, res) => {
+  if (req.params.senha !== process.env.ADMIN_SETUP_KEY) {
+    return res.status(403).json({ erro: 'Negado' })
   }
+  const usuarios = db.prepare('SELECT id, nome, email, admin FROM usuarios').all()
+  res.json(usuarios)
+})
+router.post('/tornar-admin', async (req, res) => {
+  try {
+    const { nome, senha_master } = req.body
 
-
-  const senhaCorreta = senha_master === process.env.MASTER_SECRET
-
-  if (!senhaCorreta) {
-    const tentativasAtuais = (registro?.tentativas ?? 0) + 1
-
-    if (tentativasAtuais >= 3) {
-      // Bloqueia o IP por 1 hora
-      const bloqueadoAte = new Date(agora.getTime() + 60 * 60 * 1000).toISOString()
-
-      if (registro) {
-        db.prepare(`
-          UPDATE tentativas_admin
-          SET tentativas = ?, bloqueado_ate = ?, ultima_tentativa = CURRENT_TIMESTAMP
-          WHERE ip = ?
-        `).run(tentativasAtuais, bloqueadoAte, ip)
-      } else {
-        db.prepare(`
-          INSERT INTO tentativas_admin (ip, tentativas, bloqueado_ate)
-          VALUES (?, ?, ?)
-        `).run(ip, tentativasAtuais, bloqueadoAte)
-      }
-
-      return res.status(429).json({
-        erro: 'Muitas tentativas incorretas. IP bloqueado por 1 hora.'
-      })
+    if (senha_master !== process.env.ADMIN_SETUP_KEY) {
+      return res.status(403).json({ erro: 'Senha master incorreta' })
     }
 
-    const restantes = 3 - tentativasAtuais
-    if (registro) {
-      db.prepare(`
-        UPDATE tentativas_admin
-        SET tentativas = ?, ultima_tentativa = CURRENT_TIMESTAMP
-        WHERE ip = ?
-      `).run(tentativasAtuais, ip)
-    } else {
-      db.prepare('INSERT INTO tentativas_admin (ip, tentativas) VALUES (?, ?)').run(ip, tentativasAtuais)
+    const usuario = db.prepare('SELECT * FROM usuarios WHERE nome = ?').get(nome)
+    if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado' })
+
+    // Garante que a coluna admin existe
+    try {
+      db.prepare('ALTER TABLE usuarios ADD COLUMN admin INTEGER DEFAULT 0').run()
+    } catch (e) {
+      // Coluna já existe, tudo bem
     }
 
-    return res.status(401).json({
-      erro: `Senha master incorreta. ${restantes} tentativa(s) restante(s).`
-    })
+    db.prepare('UPDATE usuarios SET admin = 1 WHERE nome = ?').run(nome)
+    res.json({ mensagem: `${usuario.nome} agora é admin!` })
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ erro: 'Erro interno', detalhe: e.message })
   }
-
-  const usuario = db.prepare('SELECT admin FROM usuarios WHERE id = ?').get(req.usuario.id)
-  if (usuario.admin === 1)
-    return res.status(409).json({ erro: 'Você já é admin.' })
-
-
-  db.prepare('UPDATE usuarios SET admin = 1 WHERE id = ?').run(req.usuario.id)
-  db.prepare('DELETE FROM tentativas_admin WHERE ip = ?').run(ip)
-
-  res.json({ mensagem: '✅ Você agora é administrador! Faça login novamente.' })
 })
 module.exports = router

@@ -110,29 +110,48 @@ async function carregarPedidosAdmin() {
   if (!res.ok) { toast('Erro ao carregar pedidos', 'erro'); return }
 
   const pedidos = await res.json()
-  const tbody = document.getElementById('tbody-pedidos')
+  const tbody   = document.getElementById('tbody-pedidos')
 
   if (pedidos.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" style="color:var(--muted);padding:1rem">Nenhum pedido ainda.</td></tr>'
+    tbody.innerHTML = '<tr><td colspan="6" style="color:var(--muted);padding:1rem">Nenhum pedido ainda.</td></tr>'
     return
   }
 
   tbody.innerHTML = pedidos.map(p => `
     <tr>
-      <td>#${p.id}</td>
+      <td style="font-weight:700">#${p.id}</td>
       <td>
-        <span style="color:var(--texto)">${p.usuario_nome || 'N/A'}</span><br>
-        <span style="color:var(--muted);font-size:.8rem">${p.usuario_email || ''}</span>
+        <p style="font-weight:600">${p.usuario_nome || 'N/A'}</p>
+        <p style="color:var(--muted);font-size:.78rem">${p.usuario_email || ''}</p>
       </td>
-      <td style="color:var(--roxo2);font-weight:700">
-        R$ ${Number(p.total).toFixed(2).replace('.', ',')}
+      <td>
+        ${p.itens.map(i => `<p style="font-size:.82rem;color:var(--muted)">${i.nome} ×${i.quantidade}</p>`).join('')}
       </td>
-      <td><span class="badge badge-verde">${p.status}</span></td>
-      <td style="color:var(--muted);font-size:.85rem">
-        ${new Date(p.criado_em).toLocaleDateString('pt-BR')}
+      <td style="color:var(--roxo2);font-weight:700">R$ ${Number(p.total).toFixed(2).replace('.', ',')}</td>
+      <td>
+        <select onchange="atualizarStatus(${p.id}, this.value)"
+          style="padding:.4rem .7rem;background:var(--bg);border:1px solid var(--borda);border-radius:6px;color:var(--texto);font-size:.82rem;width:100%">
+          <option value="aguardando_pagamento" ${p.status==='aguardando_pagamento'?'selected':''}>⏳ Aguardando pagamento</option>
+          <option value="pagamento_confirmado" ${p.status==='pagamento_confirmado'?'selected':''}>✅ Pagamento confirmado</option>
+          <option value="em_separacao"         ${p.status==='em_separacao'        ?'selected':''}>📦 Em separação</option>
+          <option value="enviado"              ${p.status==='enviado'             ?'selected':''}>🚚 Enviado</option>
+          <option value="entregue"             ${p.status==='entregue'            ?'selected':''}>🎉 Entregue</option>
+          <option value="cancelado"            ${p.status==='cancelado'           ?'selected':''}>❌ Cancelado</option>
+        </select>
       </td>
+      <td style="color:var(--muted);font-size:.82rem">${new Date(p.criado_em).toLocaleDateString('pt-BR')}</td>
     </tr>
   `).join('')
+}
+
+async function atualizarStatus(pedidoId, status) {
+  const res = await fetch(`/api/pedidos/${pedidoId}`, {
+    method:  'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ status })
+  })
+  if (res.ok) toast('Status atualizado!', 'sucesso')
+  else        toast('Erro ao atualizar', 'erro')
 }
 
 async function adicionarProduto() {

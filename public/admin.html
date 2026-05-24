@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <title>Admin — TechStore</title>
   <link rel="stylesheet" href="./assets/css/style.css">
 </head>
+
 <body>
 
   <header>
@@ -48,7 +50,8 @@
           <div class="campo campo-full">
             <label>Imagem do produto</label>
             <div class="upload-area">
-              <input type="file" id="p-imagem-file" accept="image/*" onchange="previewImagem(this, 'preview-adicionar', 'p-imagem')">
+              <input type="file" id="p-imagem-file" accept="image/*"
+                onchange="previewImagem(this, 'preview-adicionar', 'p-imagem')">
               <p>📷 Clique para escolher uma imagem</p>
               <img id="preview-adicionar" class="preview" style="display:none">
               <input type="hidden" id="p-imagem">
@@ -90,6 +93,21 @@
           <tbody id="tbody-pedidos"></tbody>
         </table>
       </div>
+      <div>
+        <table id="tabela-pedidos" style="display:none">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Cliente</th>
+              <th>Itens</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Data</th>
+            </tr>
+          </thead>
+          <tbody id="corpo-pedidos"></tbody>
+        </table>
+      </div>
 
     </div>
   </div>
@@ -118,7 +136,8 @@
       <div class="campo">
         <label>Imagem do produto</label>
         <div class="upload-area">
-          <input type="file" id="edit-imagem-file" accept="image/*" onchange="previewImagem(this, 'preview-edicao', 'edit-imagem')">
+          <input type="file" id="edit-imagem-file" accept="image/*"
+            onchange="previewImagem(this, 'preview-edicao', 'edit-imagem')">
           <p>📷 Clique para trocar a imagem</p>
           <img id="preview-edicao" class="preview" style="display:none">
           <input type="hidden" id="edit-imagem">
@@ -135,4 +154,5 @@
   <script src="./assets/js/utils.js"></script>
   <script src="./assets/js/admin.js"></script>
 </body>
+
 </html>

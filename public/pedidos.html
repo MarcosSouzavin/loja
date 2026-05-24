@@ -1,52 +1,44 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8">
-    <title>Meus Pedidos — TechStore</title>
-    <link rel="stylesheet" href="./assets/css/style.css">
+  <meta charset="UTF-8">
+  <title>Meus Pedidos — TechStore</title>
+  <link rel="stylesheet" href="./assets/css/style.css">
 </head>
-
 <body>
+  <div class="topo-bar">🚚 Frete grátis acima de R$ 299 &nbsp;|&nbsp; 🔒 Compra 100% segura</div>
 
-    <div class="topo-bar">
-        🚚 Frete grátis acima de R$ 299 &nbsp;|&nbsp; 🔒 Compra 100% segura
+  <header class="header-main">
+    <a href="/" class="logo">⚡ TechStore</a>
+    <div style="flex:1"></div>
+    <div class="header-acoes">
+      <a href="/" class="btn btn-ghost">← Voltar</a>
+      <button class="btn btn-perigo" id="btn-logout">Sair</button>
     </div>
+  </header>
 
-    <header class="header-main">
-        <a href="/" class="logo">⚡ TechStore</a>
-        <div style="flex:1"></div>
-        <div id="area-logado">
-          <span id="usuario-logado"></span>
-          <a href="/" class="btn btn-ghost">← Voltar</a>
-        </div>
-    </header>
-
-    <main style="max-width:800px">
-        <h2 style="margin-bottom:1.5rem">🧾 Meus Pedidos</h2>
-        <div id="lista-pedidos"></div>
-    </main>
-
-    <!-- Modal de acompanhamento -->
-    <div id="modal-pedido" style="display:none">
-        <div class="modal-conteudo" style="max-width:600px">
-            <h2>📦 Acompanhar Pedido</h2>
-            <p id="modal-numero" style="color:var(--muted);margin-bottom:1.5rem"></p>
-
-            <div id="status-badge-container" style="margin-bottom:1.5rem"></div>
-
-            <!-- Timeline -->
-            <div id="timeline"></div>
-
-            <button class="btn btn-ghost" id="fechar-modal-pedido" style="margin-top:1.5rem;width:100%">
-                Fechar
-            </button>
-        </div>
+  <main style="max-width:900px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+      <h2>🧾 Meus Pedidos</h2>
+      <input type="text" id="busca-pedido" placeholder="Buscar pedido..." 
+        style="padding:.6rem 1rem;background:var(--card);border:1px solid var(--borda);border-radius:8px;color:var(--texto);font-size:.9rem;width:220px">
     </div>
+    <div id="lista-pedidos"></div>
+  </main>
 
-    <div id="toast-container"></div>
-    <script src="./assets/js/utils.js"></script>
-    <script src="./assets/js/pedidos.js"></script>
+  <!-- Modal pedido -->
+  <div id="modal-pedido" style="display:none">
+    <div class="modal-conteudo" style="max-width:640px;max-height:90vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+        <h2 id="modal-titulo">Detalhes do Pedido</h2>
+        <button onclick="fecharModal()" style="background:none;border:none;color:var(--muted);font-size:1.5rem;cursor:pointer">✕</button>
+      </div>
+      <div id="modal-conteudo-pedido"></div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="./assets/js/utils.js"></script>
+  <script src="./assets/js/pedidos.js"></script>
 </body>
-
 </html>
