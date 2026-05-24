@@ -48,6 +48,68 @@ async function carregarPedidosAdmin() {
   if (!res.ok) { toast('Erro ao carregar pedidos', 'erro'); return }
 
   const pedidos = await res.json()
+  const tbody   = document.getElementById('tbody-pedidos')
+
+  if (pedidos.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="color:var(--muted);padding:1rem">Nenhum pedido ainda.</td></tr>'
+    return
+  }
+
+  tbody.innerHTML = pedidos.map(p => `
+    <tr>
+      <td>#${p.id}</td>
+      <td>
+        <span>${p.usuario_nome || 'N/A'}</span><br>
+        <span style="color:var(--muted);font-size:.8rem">${p.usuario_email || ''}</span>
+      </td>
+      <td style="color:var(--roxo2);font-weight:700">
+        R$ ${Number(p.total).toFixed(2).replace('.', ',')}
+      </td>
+      <td>
+        <select onchange="atualizarStatus(${p.id}, this.value)"
+          style="padding:.4rem .8rem;background:var(--bg);border:1px solid var(--borda);border-radius:6px;color:var(--texto);font-size:.85rem">
+          <option value="aguardando_pagamento" ${p.status === 'aguardando_pagamento' ? 'selected' : ''}>⏳ Aguardando pagamento</option>
+          <option value="pagamento_confirmado" ${p.status === 'pagamento_confirmado' ? 'selected' : ''}>✅ Pagamento confirmado</option>
+          <option value="em_separacao"         ${p.status === 'em_separacao'         ? 'selected' : ''}>📦 Em separação</option>
+          <option value="enviado"              ${p.status === 'enviado'              ? 'selected' : ''}>🚚 Enviado</option>
+          <option value="entregue"             ${p.status === 'entregue'             ? 'selected' : ''}>🎉 Entregue</option>
+          <option value="cancelado"            ${p.status === 'cancelado'            ? 'selected' : ''}>❌ Cancelado</option>
+        </select>
+      </td>
+      <td style="color:var(--muted);font-size:.85rem">
+        ${new Date(p.criado_em).toLocaleDateString('pt-BR')}
+      </td>
+    </tr>
+  `).join('')
+}
+
+async function atualizarStatus(pedidoId, status) {
+  const mensagens = {
+    pagamento_confirmado: 'Seu pagamento foi confirmado!',
+    em_separacao:         'Estamos separando seu pedido.',
+    enviado:              'Seu pedido foi enviado!',
+    entregue:             'Pedido entregue com sucesso!',
+    cancelado:            'Seu pedido foi cancelado.',
+  }
+
+  const res = await fetch(`/api/status/${pedidoId}`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ status, mensagem: mensagens[status] || null })
+  })
+
+  if (res.ok) {
+    toast('Status atualizado!', 'sucesso')
+  } else {
+    toast('Erro ao atualizar status', 'erro')
+  }
+}
+
+async function carregarPedidosAdmin() {
+  const res = await fetch('/api/pedidos/todos')
+  if (!res.ok) { toast('Erro ao carregar pedidos', 'erro'); return }
+
+  const pedidos = await res.json()
   const tbody = document.getElementById('tbody-pedidos')
 
   if (pedidos.length === 0) {

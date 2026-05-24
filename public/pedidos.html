@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Meus Pedidos — TechStore</title>
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+
+<body>
+
+    <div class="topo-bar">
+        🚚 Frete grátis acima de R$ 299 &nbsp;|&nbsp; 🔒 Compra 100% segura
+    </div>
+
+    <header class="header-main">
+        <a href="/" class="logo">⚡ TechStore</a>
+        <div style="flex:1"></div>
+        <div id="area-logado">
+          <span id="usuario-logado"></span>
+          <a href="/" class="btn btn-ghost">← Voltar</a>
+        </div>
+    </header>
+
+    <main style="max-width:800px">
+        <h2 style="margin-bottom:1.5rem">🧾 Meus Pedidos</h2>
+        <div id="lista-pedidos"></div>
+    </main>
+
+    <!-- Modal de acompanhamento -->
+    <div id="modal-pedido" style="display:none">
+        <div class="modal-conteudo" style="max-width:600px">
+            <h2>📦 Acompanhar Pedido</h2>
+            <p id="modal-numero" style="color:var(--muted);margin-bottom:1.5rem"></p>
+
+            <div id="status-badge-container" style="margin-bottom:1.5rem"></div>
+
+            <!-- Timeline -->
+            <div id="timeline"></div>
+
+            <button class="btn btn-ghost" id="fechar-modal-pedido" style="margin-top:1.5rem;width:100%">
+                Fechar
+            </button>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="./assets/js/utils.js"></script>
+    <script src="./assets/js/pedidos.js"></script>
+</body>
+
+</html>

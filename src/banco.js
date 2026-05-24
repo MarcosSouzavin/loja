@@ -2,6 +2,14 @@ const Database = require('better-sqlite3');
 const db = new Database('loja.db');
 
 db.exec(`
+    CREATE TABLE IF NOT EXISTS historic_pedidos(
+    id INTEGER PRIMARY KEY AUTOINCREMENT ,
+    pedido_id INTEGER NOT NULL,
+    status TEXT NOT NULL,
+    msg TEXT,
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,   
+    FOREIGN KEY (pedido_id) REFERENCES pedidos(id)
+);
     CREATE TABLE IF NOT EXISTS avaliacoes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     produto_id INTEGER NOT NULL,

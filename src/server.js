@@ -53,6 +53,7 @@ app.use('/api/produtos',  require('./rotas/produtos'))
 app.use('/api/usuarios',  require('./rotas/usuarios'))
 app.use('/api/pedidos',   require('./rotas/pedidos'))
 app.use('/api/avaliacoes', require('./rotas/avaliacoes'))
+app.use('/api/status', require('./rotas/status').router)
 
 
 // ── Rota 404 para API ──

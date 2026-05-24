@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
   carregarProdutos()
   atualizarContador()
   verificarLogin()
+  iniciarCarrossel()
+  verificarPedidos()
 
   document.getElementById('btn-carrinho').addEventListener('click', abrirCarrinho)
   document.getElementById('btn-fechar').addEventListener('click', fecharCarrinho)
@@ -206,7 +208,29 @@ function destacar(texto, busca) {
   const regex = new RegExp(`(${busca})`, 'gi')
   return texto.replace(regex, `<mark style="background:var(--roxo);color:white;border-radius:3px;padding:0 2px">$1</mark>`)
 }
+async function verificarPedidos() {
+   const res = await fetch('/api/usuarios/perfil').catch(() => null)
+  if (res && res.ok) {
+    const data = await res.json()
+    document.getElementById('usuario-logado').textContent = `Olá, ${data.nome}`
+    document.getElementById('area-logado').style.display = 'flex'
+    document.getElementById('link-login').style.display = 'none'
 
+    const areaUsuario = document.getElementById('area-usuario')
+    if (!document.getElementById('link-pedidos')) {
+      const linkPedidos = document.createElement('a')
+      linkPedidos.id        = 'link-pedidos'
+      linkPedidos.href      = 'pedidos.html'
+      linkPedidos.className = 'header-btn'
+      linkPedidos.textContent = '🧾 Pedidos'
+      areaUsuario.appendChild(linkPedidos)
+    }
+
+    if (data.admin) {
+      document.getElementById('link-admin').style.display = 'inline-flex'
+    }
+  }
+}
 async function verificarLogin() {
   const res = await fetch('/api/usuarios/perfil').catch(() => null)
   
@@ -239,16 +263,15 @@ async function verificarLogin() {
     }
 
   } 
-  // CASO 2: DESLOGADO (Ou o token expirou / deu erro na rota)
+
   else {
     // 1. Garante que o botão de Entrar reapareça
     if (linkLogin) linkLogin.style.display = 'inline-flex'
 
-    // 2. Esconde todo o resto (Nome, Sair, Engrenagem)
     if (areaLogado) areaLogado.style.display = 'none'
     if (btnLogout) btnLogout.style.display = 'none'
     if (linkAdmin) linkAdmin.style.display = 'none'
-  }
+  } 
 }
 
 async function logout() {
@@ -256,3 +279,30 @@ async function logout() {
   toast('Até logo!', 'info')
   setTimeout(() => location.reload(), 1000)
 }
+
+let slideAtual = 0
+const totalSlides = 3
+
+function irParaSlide(n) {
+  slideAtual = (n + totalSlides) % totalSlides
+  document.querySelector('.banner-slides').style.transform = `translateX(-${slideAtual * 100}%)`
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('ativo', i === slideAtual)
+  })
+}
+
+function iniciarCarrossel() {
+  document.getElementById('seta-dir').addEventListener('click', () => irParaSlide(slideAtual + 1))
+  document.getElementById('seta-esq').addEventListener('click', () => irParaSlide(slideAtual - 1))
+
+  document.querySelectorAll('.dot').forEach(dot => {
+    dot.addEventListener('click', () => irParaSlide(parseInt(dot.dataset.slide)))
+  })
+
+  // Troca automática a cada 5 segundos
+  setInterval(() => irParaSlide(slideAtual + 1), 5000)
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  iniciarCarrossel()
+})

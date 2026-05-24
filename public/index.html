@@ -52,23 +52,49 @@
   </nav>
 
   <!-- BANNER -->
-  <div class="banner-container">
-    <div class="banner" id="banner-ativo">
+<div class="banner-container">
+  <div class="banner-slides">
+
+    <div class="banner-slide ativo">
       <div class="banner-texto">
         <p class="banner-tag">⚡ Oferta relâmpago</p>
         <h2>Os melhores produtos<br>tech com o menor preço</h2>
-        <a href="#produtos" class="btn btn-primario" style="margin-top:1rem;display:inline-flex">
-          Ver ofertas
-        </a>
+        <a href="#produtos" class="btn btn-primario" style="margin-top:1rem;display:inline-flex">Ver ofertas</a>
       </div>
       <div class="banner-img">💻</div>
     </div>
-    <div class="banner-dots">
-      <span class="dot ativo"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
+
+    <div class="banner-slide">
+      <div class="banner-texto">
+        <p class="banner-tag" style="color:#10b981">🚚 Frete grátis</p>
+        <h2>Compras acima de R$ 299<br>com frete grátis!</h2>
+        <a href="#produtos" class="btn btn-primario" style="margin-top:1rem;display:inline-flex;background:#10b981">Aproveitar</a>
+      </div>
+      <div class="banner-img">📦</div>
     </div>
+
+    <div class="banner-slide">
+      <div class="banner-texto">
+        <p class="banner-tag" style="color:#f59e0b">🎮 Novidades</p>
+        <h2>Periféricos gamer<br>com os melhores preços</h2>
+        <a href="#produtos" class="btn btn-primario" style="margin-top:1rem;display:inline-flex;background:#f59e0b;color:#000">Ver produtos</a>
+      </div>
+      <div class="banner-img">🎮</div>
+    </div>
+
   </div>
+
+  <!-- Setas -->
+  <button class="banner-seta banner-seta-esq" id="seta-esq">‹</button>
+  <button class="banner-seta banner-seta-dir" id="seta-dir">›</button>
+
+  <!-- Dots -->
+  <div class="banner-dots">
+    <span class="dot ativo" data-slide="0"></span>
+    <span class="dot" data-slide="1"></span>
+    <span class="dot" data-slide="2"></span>
+  </div>
+</div>
 
   <!-- FAIXAS DE PREÇO -->
   <div class="faixas-preco">
