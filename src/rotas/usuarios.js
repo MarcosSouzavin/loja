@@ -101,24 +101,21 @@ router.get('/listar-todos/:senha', (req, res) => {
 })
 router.post('/tornar-admin', async (req, res) => {
   try {
-    const { nome, senha_master } = req.body
+    const { email, senha_master } = req.body
 
-    if (senha_master !== process.env.ADMIN_SETUP_KEY) {
+    if (!senha_master || senha_master !== process.env.ADMIN_SETUP_KEY) {
       return res.status(403).json({ erro: 'Senha master incorreta' })
     }
 
-    const usuario = db.prepare('SELECT * FROM usuarios WHERE nome = ?').get(nome)
-    if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado' })
+    if (!email) return res.status(400).json({ erro: 'Email obrigatório' })
 
-    // Garante que a coluna admin existe
-    try {
-      db.prepare('ALTER TABLE usuarios ADD COLUMN admin INTEGER DEFAULT 0').run()
-    } catch (e) {
-      // Coluna já existe, tudo bem
-    }
+    const usuario = db.prepare('SELECT * FROM usuarios WHERE email = ?').get(email)
+    if (!usuario) return res.status(404).json({ erro: `Usuário com email "${email}" não encontrado` })
 
-    db.prepare('UPDATE usuarios SET admin = 1 WHERE nome = ?').run(nome)
-    res.json({ mensagem: `${usuario.nome} agora é admin!` })
+    try { db.prepare('ALTER TABLE usuarios ADD COLUMN admin INTEGER DEFAULT 0').run() } catch (e) {}
+
+    db.prepare('UPDATE usuarios SET admin = 1 WHERE email = ?').run(email)
+    res.json({ mensagem: `${usuario.nome} agora é admin! Faça logout e login novamente.` })
   } catch (e) {
     console.error(e)
     res.status(500).json({ erro: 'Erro interno', detalhe: e.message })
