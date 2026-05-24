@@ -257,3 +257,58 @@ function iniciarCarrossel() {
   })
   setInterval(() => irParaSlide(slideAtual + 1), 5000)
 }
+
+// ── RESPONSIVO / MOBILE ──
+function iniciarResponsive() {
+  // menu hamburguer (toggle)
+  const btnMenu = document.getElementById('btn-menu')
+  const nav = document.querySelector('nav')
+  btnMenu?.addEventListener('click', () => {
+    nav?.classList.toggle('aberto')
+  })
+
+  // adapta carrinho: em telas pequenas mostra como fullscreen/modal
+  function ajustarCarrinhoPorLargura() {
+    const carrinhoEl = document.getElementById('carrinho')
+    if (!carrinhoEl) return
+    if (window.innerWidth <= 768) {
+      carrinhoEl.classList.add('mobile')
+    } else {
+      carrinhoEl.classList.remove('mobile')
+    }
+  }
+  ajustarCarrinhoPorLargura()
+  window.addEventListener('resize', ajustarCarrinhoPorLargura)
+
+  // toque / swipe para carrossel
+  const slides = document.querySelector('.banner-slides')
+  if (slides) {
+    let startX = 0
+    let dist = 0
+    slides.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX
+      dist = 0
+    }, { passive: true })
+    slides.addEventListener('touchmove', e => {
+      dist = e.touches[0].clientX - startX
+    }, { passive: true })
+    slides.addEventListener('touchend', () => {
+      if (Math.abs(dist) > 50) {
+        if (dist < 0) irParaSlide(slideAtual + 1)
+        else irParaSlide(slideAtual - 1)
+      }
+    })
+  }
+
+  // adaptar grade de produtos conforme largura
+  function ajustarGridProdutos() {
+    document.documentElement.style.setProperty('--cols-produtos', window.innerWidth <= 480 ? '1' : window.innerWidth <= 900 ? '2' : '3')
+  }
+  ajustarGridProdutos()
+  window.addEventListener('resize', ajustarGridProdutos)
+}
+
+// Inicializa comportamentos responsivos
+document.addEventListener('DOMContentLoaded', () => {
+  iniciarResponsive()
+})
